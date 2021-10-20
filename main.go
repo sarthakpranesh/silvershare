@@ -23,11 +23,11 @@ func main() {
 	app.Get("/key/all", key.AllKeys)
 	app.Get("/key/:id", key.KeyDetails)
 	app.Post("/key/share", key.KeyShare)
-	app.Use("/img/enc", image.EncryptImage)
-	app.Use("/img/dec", image.DecryptImage)
+	app.Post("/img/enc", image.EncryptImage)
+	app.Post("/img/dec", image.DecryptImage)
 
 	// Not use Default "*" catcher, handles any route not implemented on server
-	app.Get("*", func(c *fiber.Ctx) error {
+	app.Use("*", func(c *fiber.Ctx) error {
 		return c.SendString("Not yet implemented!")
 	})
 
