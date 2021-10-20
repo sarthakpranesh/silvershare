@@ -10,13 +10,14 @@ import (
 type Key struct {
 	gorm.Model
 	Secret     []byte   `json:"secret"`
-	UserId     uint     `json:"userId"`
+	UserId     string   `json:"uid"`
 	SharedWith []Shared `json:"sharedWith"`
 }
 
 type Shared struct {
-	KeyId  uint `json:"keyId"`
-	UserId uint `json:"userId"`
+	KeyId  uint   `json:"keyId"`
+	UserId string `json:"uid"`
+	Email  string `json:"email"`
 }
 
 func CreateKey(k *Key) error {
@@ -29,18 +30,18 @@ func CreateKey(k *Key) error {
 	return nil
 }
 
-func AllUserKeys(UserId uint) (*[]Key, error) {
+func AllUserKeys(uid string) (*[]Key, error) {
 	db, _ := connections.PostgresConnector()
 	db.AutoMigrate(&Key{})
 	var keys []Key
-	result := db.Table("keys").Where("user_id", UserId).Find(&keys)
+	result := db.Table("keys").Where("user_id", uid).Find(&keys)
 	if result.Error != nil {
 		return &keys, result.Error
 	}
 	return &keys, nil
 }
 
-func GetKey(id uint, user_id uint) (*Key, error) {
+func GetKey(id uint, uid string) (*Key, error) {
 	db, _ := connections.PostgresConnector()
 	db.AutoMigrate(&Key{})
 	var key Key
@@ -48,15 +49,16 @@ func GetKey(id uint, user_id uint) (*Key, error) {
 	if result.Error != nil {
 		return &key, result.Error
 	}
-	if key.UserId != user_id {
-		var shareds []Shared
-		result := db.Table("shareds").Where(id).Find(&shareds)
-		if result.Error != nil {
-			return &key, result.Error
-		}
+	var shareds []Shared
+	result = db.Table("shareds").Where(id).Find(&shareds)
+	if result.Error != nil {
+		return &key, result.Error
+	}
+	key.SharedWith = shareds
+	if key.UserId != uid {
 		var isSharedKey bool
-		for _, s := range shareds {
-			if s.UserId == user_id {
+		for _, s := range key.SharedWith {
+			if s.UserId == uid {
 				isSharedKey = true
 				break
 			}
@@ -68,7 +70,7 @@ func GetKey(id uint, user_id uint) (*Key, error) {
 	return &key, nil
 }
 
-func ShareKey(user_id uint, share Shared) error {
+func ShareKey(uid string, share Shared) error {
 	db, _ := connections.PostgresConnector()
 	db.AutoMigrate(&Shared{})
 	var key Key
@@ -76,9 +78,20 @@ func ShareKey(user_id uint, share Shared) error {
 	if result.Error != nil {
 		return result.Error
 	}
-	if key.UserId != user_id {
+	if key.UserId != uid {
 		return errors.New("not authorized")
 	}
+	var userEmail struct {
+		Uid string `json:"uid"`
+	}
+	result = db.Table("users").Where("email", share.Email).First(&userEmail)
+	if result.Error != nil {
+		return result.Error
+	}
+	if userEmail.Uid == "" {
+		return errors.New("no user found")
+	}
+	share.UserId = userEmail.Uid
 	result = db.Create(share)
 	if result.Error != nil {
 		return result.Error

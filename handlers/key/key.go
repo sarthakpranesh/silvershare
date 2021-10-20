@@ -12,19 +12,11 @@ import (
 )
 
 func NewKey(c *fiber.Ctx) error {
-	rawUserId := c.Get("Authorization")
-	rawUserId = strings.Replace(rawUserId, "Bearer", "", -1)
-	rawUserId = strings.TrimSpace(rawUserId)
-	user_id, err := strconv.ParseUint(rawUserId, 0, 0)
-	if err != nil {
-		fmt.Println(err)
-		return c.JSON(responses.ErrorResponse{
-			Message: err.Error(),
-			Status:  500,
-		})
-	}
+	rawUID := c.Get("Authorization")
+	rawUID = strings.Replace(rawUID, "Bearer", "", -1)
+	rawUID = strings.TrimSpace(rawUID)
 	key := make([]byte, 32)
-	_, err = rand.Read(key)
+	_, err := rand.Read(key)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(responses.ErrorResponse{
@@ -34,7 +26,7 @@ func NewKey(c *fiber.Ctx) error {
 	}
 	k := keyControllers.Key{
 		Secret: key,
-		UserId: uint(user_id),
+		UserId: rawUID,
 	}
 	err = keyControllers.CreateKey(&k)
 	if err != nil {
@@ -48,18 +40,10 @@ func NewKey(c *fiber.Ctx) error {
 }
 
 func AllKeys(c *fiber.Ctx) error {
-	rawUserId := c.Get("Authorization")
-	rawUserId = strings.Replace(rawUserId, "Bearer", "", -1)
-	rawUserId = strings.TrimSpace(rawUserId)
-	user_id, err := strconv.ParseUint(rawUserId, 0, 0)
-	if err != nil {
-		fmt.Println(err)
-		return c.JSON(responses.ErrorResponse{
-			Message: err.Error(),
-			Status:  500,
-		})
-	}
-	keys, err := keyControllers.AllUserKeys(uint(user_id))
+	rawUID := c.Get("Authorization")
+	rawUID = strings.Replace(rawUID, "Bearer", "", -1)
+	rawUID = strings.TrimSpace(rawUID)
+	keys, err := keyControllers.AllUserKeys(rawUID)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(responses.ErrorResponse{
@@ -71,17 +55,9 @@ func AllKeys(c *fiber.Ctx) error {
 }
 
 func KeyDetails(c *fiber.Ctx) error {
-	rawUserId := c.Get("Authorization")
-	rawUserId = strings.Replace(rawUserId, "Bearer", "", -1)
-	rawUserId = strings.TrimSpace(rawUserId)
-	user_id, err := strconv.ParseUint(rawUserId, 0, 0)
-	if err != nil {
-		fmt.Println(err)
-		return c.JSON(responses.ErrorResponse{
-			Message: err.Error(),
-			Status:  500,
-		})
-	}
+	rawUID := c.Get("Authorization")
+	rawUID = strings.Replace(rawUID, "Bearer", "", -1)
+	rawUID = strings.TrimSpace(rawUID)
 	id, err := strconv.ParseUint(c.Params("id"), 0, 0)
 	if err != nil {
 		fmt.Println(err)
@@ -90,7 +66,7 @@ func KeyDetails(c *fiber.Ctx) error {
 			Status:  500,
 		})
 	}
-	key, err := keyControllers.GetKey(uint(id), uint(user_id))
+	key, err := keyControllers.GetKey(uint(id), rawUID)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(responses.ErrorResponse{
@@ -102,19 +78,11 @@ func KeyDetails(c *fiber.Ctx) error {
 }
 
 func KeyShare(c *fiber.Ctx) error {
-	rawUserId := c.Get("Authorization")
-	rawUserId = strings.Replace(rawUserId, "Bearer", "", -1)
-	rawUserId = strings.TrimSpace(rawUserId)
-	user_id, err := strconv.ParseUint(rawUserId, 0, 0)
-	if err != nil {
-		fmt.Println(err)
-		return c.JSON(responses.ErrorResponse{
-			Message: err.Error(),
-			Status:  500,
-		})
-	}
+	rawUID := c.Get("Authorization")
+	rawUID = strings.Replace(rawUID, "Bearer", "", -1)
+	rawUID = strings.TrimSpace(rawUID)
 	var shared keyControllers.Shared
-	err = c.BodyParser(&shared)
+	err := c.BodyParser(&shared)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(responses.ErrorResponse{
@@ -122,7 +90,7 @@ func KeyShare(c *fiber.Ctx) error {
 			Status:  400,
 		})
 	}
-	err = keyControllers.ShareKey(uint(user_id), shared)
+	err = keyControllers.ShareKey(rawUID, shared)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(responses.ErrorResponse{

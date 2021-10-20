@@ -8,6 +8,7 @@ import (
 
 type User struct {
 	Id    int    `json:"id"`
+	Uid   string `json:"uid"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 	Keys  []keyControllers.Key
