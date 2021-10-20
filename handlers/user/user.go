@@ -1,8 +1,8 @@
 package user
 
 import (
-	"Github/sarthakpranesh/silvershare/controllers"
 	"Github/sarthakpranesh/silvershare/controllers/responses"
+	controllers "Github/sarthakpranesh/silvershare/controllers/user"
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"

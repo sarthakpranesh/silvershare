@@ -17,10 +17,10 @@ func main() {
 	// Protected routes, see the middleware
 	app.Use(middleware.Authentication)
 	app.Post("/user", user.Register)
-	app.Use("/key/new", key.NewKey)
-	app.Use("/key/all", key.AllKeys)
-	app.Use("/key/:id", key.KeyDetails)
-	app.Use("/key/share", key.KeyShare)
+	app.Get("/key/new", key.NewKey)
+	app.Get("/key/all", key.AllKeys)
+	app.Get("/key/:id", key.KeyDetails)
+	app.Post("/key/share", key.KeyShare)
 	app.Use("/img/enc", image.EncryptImage)
 	app.Use("/img/dec", image.DecryptImage)
 
