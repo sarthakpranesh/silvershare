@@ -9,9 +9,11 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load(".env")
 	app := fiber.New()
 
 	// Protected routes, see the middleware
@@ -36,5 +38,5 @@ func main() {
 	}
 
 	// app listening to port and other options
-	app.Listen("localhost:8080")
+	app.Listen("0.0.0.0:" + os.Getenv("PORT"))
 }
