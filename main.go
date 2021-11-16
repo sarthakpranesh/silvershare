@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 )
 
@@ -17,6 +18,7 @@ func main() {
 	app := fiber.New()
 
 	// Protected routes, see the middleware
+	app.Use(cors.New())
 	app.Use(middleware.Authentication)
 	app.Post("/user", user.Register)
 	app.Get("/key/new", key.NewKey)
