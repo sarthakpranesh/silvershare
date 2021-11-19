@@ -21,8 +21,7 @@ type Shared struct {
 }
 
 func CreateKey(k *Key) error {
-	db, _ := connections.PostgresConnector()
-	db.AutoMigrate(&Key{})
+	db := connections.DB
 	result := db.Create(k)
 	if result.Error != nil {
 		return result.Error
@@ -31,8 +30,7 @@ func CreateKey(k *Key) error {
 }
 
 func AllUserKeys(uid string) (*[]Key, error) {
-	db, _ := connections.PostgresConnector()
-	db.AutoMigrate(&Key{})
+	db := connections.DB
 	var keys []Key
 	result := db.Table("keys").Where("user_id", uid).Find(&keys)
 	if result.Error != nil {
@@ -42,8 +40,7 @@ func AllUserKeys(uid string) (*[]Key, error) {
 }
 
 func GetKey(id uint, uid string) (*Key, error) {
-	db, _ := connections.PostgresConnector()
-	db.AutoMigrate(&Key{})
+	db := connections.DB
 	var key Key
 	result := db.Table("keys").Where(id).First(&key)
 	if result.Error != nil {
@@ -71,8 +68,7 @@ func GetKey(id uint, uid string) (*Key, error) {
 }
 
 func ShareKey(uid string, share Shared) error {
-	db, _ := connections.PostgresConnector()
-	db.AutoMigrate(&Shared{})
+	db := connections.DB
 	var key Key
 	result := db.Table("keys").Where(share.KeyId).First(&key)
 	if result.Error != nil {

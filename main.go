@@ -15,6 +15,10 @@ import (
 
 func main() {
 	godotenv.Load(".env")
+
+	// initiate the app database
+	connections.PostgresConnector()
+
 	app := fiber.New()
 
 	// Protected routes, see the middleware
@@ -32,12 +36,6 @@ func main() {
 	app.Use("*", func(c *fiber.Ctx) error {
 		return c.SendString("Not yet implemented!")
 	})
-
-	// initiate the app database
-	_, err := connections.PostgresConnector()
-	if err != nil {
-		os.Exit(1)
-	}
 
 	// app listening to port and other options
 	app.Listen("0.0.0.0:" + os.Getenv("PORT"))

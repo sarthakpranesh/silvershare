@@ -15,8 +15,7 @@ type User struct {
 }
 
 func CreateUser(user *User) error {
-	db, _ := connections.PostgresConnector()
-	db.AutoMigrate(&User{})
+	db := connections.DB
 	result := db.Create(user)
 	if result.Error != nil {
 		return result.Error
