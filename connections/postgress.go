@@ -18,4 +18,5 @@ func PostgresConnector() {
 		os.Exit(1)
 	}
 	DB.AutoMigrate()
+	fmt.Println("Database connected")
 }
