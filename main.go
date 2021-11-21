@@ -6,6 +6,7 @@ import (
 	"Github/sarthakpranesh/silvershare/handlers/key"
 	"Github/sarthakpranesh/silvershare/handlers/user"
 	"Github/sarthakpranesh/silvershare/middleware"
+	"fmt"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,6 +16,12 @@ import (
 
 func main() {
 	godotenv.Load(".env")
+
+	// creating required file directories to process images
+	err := os.Mkdir("temp", 0777)
+	if err != nil {
+		fmt.Println("Unable to create `temp` directory for image processing, error: ", err)
+	}
 
 	// initiate the app database
 	connections.PostgresConnector()
